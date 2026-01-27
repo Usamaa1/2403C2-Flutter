@@ -8,14 +8,17 @@ class MyCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CarouselSlider(
-      items: images,
-      options: CarouselOptions(
-        height: 400,
-        viewportFraction: 1,
-        // reverse: true,
-        autoPlay: true,
-        // autoPlayInterval: Duration(seconds: 10),
+    return SizedBox(
+      height: 400,
+      child: CarouselSlider(
+        items: images,
+        options: CarouselOptions(
+          height: 400,
+          viewportFraction: 1,
+          // reverse: true,
+          autoPlay: true,
+          // autoPlayInterval: Duration(seconds: 10),
+        ),
       ),
     );
   }

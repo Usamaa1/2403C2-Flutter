@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:basicsapp/Home.dart';
 import 'package:basicsapp/MyTextFeild.dart';
-import 'package:basicsapp/ProductScreen.dart';
 import 'package:basicsapp/Signup.dart';
 
 class Login extends StatelessWidget {
@@ -24,7 +23,7 @@ class Login extends StatelessWidget {
         if (credential.user!.emailVerified) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => ProductsScreen()),
+            MaterialPageRoute(builder: (context) => Home()),
           );
         } else {
           print("Email is not verified");

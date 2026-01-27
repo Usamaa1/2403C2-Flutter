@@ -1,7 +1,9 @@
 import 'package:basicsapp/MyCarousel.dart';
 import 'package:basicsapp/MyCart.dart';
+import 'package:basicsapp/MyProductsElectronics.dart';
+import 'package:basicsapp/MyProductsFashion.dart';
 import 'package:basicsapp/MyTabbar.dart';
-import 'package:basicsapp/MyTabbarView.dart';
+import 'package:basicsapp/ProductScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -30,28 +32,42 @@ class Home extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           leading: CircleAvatar(child: FaIcon(FontAwesomeIcons.user)),
-          title: Center(child: Text("Home Screen")),
+          title: Text("Home Screen"),
           actions: [
             IconButton(
-              onPressed: () {
-                print("funciton performed");
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyCart()),
-                );
-              },
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => MyCart()),
+              ),
               icon: FaIcon(FontAwesomeIcons.cartShopping),
             ),
           ],
         ),
+        body: NestedScrollView(
+          headerSliverBuilder: (context, innerBoxIsScrolled) => [
+            
+            SliverToBoxAdapter(child: MyCarousel(images: images)),
 
-        body: Column(
-          children: [
-            MyCarousel(images: images),
-            Container(padding: const EdgeInsets.all(8.0), child: MyTabbar()),
-
-            MyTabbarView(),
+            
+            SliverAppBar(
+              pinned: true,
+              floating: false,
+              backgroundColor: Colors.white,
+              bottom: PreferredSize(
+                preferredSize: Size.zero,
+                child: MyTabbar(), 
+              ),
+            ),
           ],
+          body: TabBarView(
+            children: [
+              ProductsScreen(),
+              MyProductsFashion(),
+              MyProductsElectronics(),
+              Center(child: Text("Tab 4 Content")),
+            ],
+          ),
+        
         ),
       ),
     );

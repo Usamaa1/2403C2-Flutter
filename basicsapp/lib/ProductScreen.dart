@@ -11,12 +11,13 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  final Stream<QuerySnapshot> prods = FirebaseFirestore.instance
-      .collection("Products")
-      .snapshots();
+  final Stream<QuerySnapshot> prods =
+      FirebaseFirestore.instance.collection("Products").snapshots();
   final addToCartItems = FirebaseFirestore.instance.collection("addToCart");
 
-  var uid = FirebaseAuth.instance.currentUser!.uid;
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+
+  List<String> cartItems = [];
 
   @override
   void initState() {
@@ -24,96 +25,105 @@ class _ProductsScreenState extends State<ProductsScreen> {
     getCart();
   }
 
-  void addToCartHandler(String uid, String prodId) {
-    addToCartItems.add({"userId": uid, "prodId": prodId});
+  /// 🔹 GET CART ITEMS
+  Future<void> getCart() async {
+    final snapshot =
+        await addToCartItems.where("userId", isEqualTo: uid).get();
+
+    setState(() {
+      cartItems = snapshot.docs.map((e) => e["prodId"] as String).toList();
+    });
   }
 
-  void deleteToCartHandler(var prodId) {
-   var itemToDelte= addToCartItems
-        .where("userId", isEqualTo: uid)
-        .where("prodId", isEqualTo: prodId);
+  /// 🔹 ADD TO CART
+  Future<void> addToCartHandler(String prodId) async {
+    if (cartItems.contains(prodId)) return;
+
+    await addToCartItems.add({"userId": uid, "prodId": prodId});
+    await getCart();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Product added to your Cart"),
+        backgroundColor: Colors.blueAccent,
+      ),
+    );
   }
 
-  var cartItems = [];
-
-  void getCart() async {
-    var getCartItems = await addToCartItems
+  /// 🔹 DELETE FROM CART
+  Future<void> deleteFromCartHandler(String prodId) async {
+    final snapshot = await addToCartItems
         .where("userId", isEqualTo: uid)
+        .where("prodId", isEqualTo: prodId)
         .get();
-    print("Hello");
-    print(getCartItems.docs);
 
-    for (var el in getCartItems.docs) {
-      cartItems.add(el["prodId"]);
+    for (var doc in snapshot.docs) {
+      await doc.reference.delete();
     }
 
-    print(cartItems);
+    await getCart();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Product removed from Cart"),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Text("Our Products!"),
-          Flexible(
-            child: StreamBuilder(
-              stream: prods,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
-                return GridView.builder(
-                  itemCount: snapshot.data!.size,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisExtent: 300,
-                    // crossAxisSpacing: 30,
-                    // mainAxisSpacing: 30,
-                  ),
-                  itemBuilder: (context, index) {
-                    final prodData = snapshot.data!.docs;
+    return Column(
+      children: [
+        Flexible(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: prods,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-                    return MyCard(
-                      onPressed: () {
-                        print("Click event occurs");
-                        print(uid);
-                        print(prodData[index].id);
+              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                return const Center(child: Text("No products found"));
+              }
 
-                        if (cartItems.contains(prodData[index].id)) {
-                        } else {
-                          addToCartHandler(uid, prodData[index].id);
+              final prodData = snapshot.data!.docs;
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                "Product added to your Cart",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.blueAccent,
-                            ),
-                          );
-                        }
-                      },
-                      cartIcon: cartItems.contains(prodData[index].id)
-                          ? Icon(Icons.remove, size: 18)
-                          : Icon(
-                              Icons.shopping_bag,
-                              size: 18,
-                              color: Colors.blueAccent,
-                            ),
-                      imageName: prodData[index]['prodImage'],
-                      productName: prodData[index]['prodName'],
-                      productDescription: prodData[index]['prodDescription'],
-                      productPrice: prodData[index]['prodPrice'],
-                    );
-                  },
-                );
-              },
-            ),
+              return GridView.builder(
+                padding: const EdgeInsets.all(8),
+                itemCount: prodData.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.85,
+                ),
+                itemBuilder: (context, index) {
+                  final prodId = prodData[index].id;
+                  final inCart = cartItems.contains(prodId);
+
+                  return MyCard(
+                    imageName: prodData[index]['prodImage'],
+                    productName: prodData[index]['prodName'].toString().trim(),
+                    productDescription: prodData[index]['prodDescription'],
+                    productPrice: prodData[index]['prodPrice'],
+                    cartIcon: Icon(
+                      inCart ? Icons.remove : Icons.shopping_bag,
+                      size: 18,
+                      color: inCart ? Colors.red : Colors.blueAccent,
+                    ),
+                    onPressed: () {
+                      if (inCart) {
+                        deleteFromCartHandler(prodId);
+                      } else {
+                        addToCartHandler(prodId);
+                      }
+                    },
+                  );
+                },
+              );
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

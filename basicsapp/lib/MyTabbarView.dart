@@ -1,6 +1,6 @@
-import 'package:basicsapp/MyProducts.dart';
 import 'package:basicsapp/MyProductsElectronics.dart';
 import 'package:basicsapp/MyProductsFashion.dart';
+import 'package:basicsapp/ProductScreen.dart';
 import 'package:flutter/material.dart';
 
 class MyTabbarView extends StatelessWidget {
@@ -11,7 +11,7 @@ class MyTabbarView extends StatelessWidget {
     return Expanded(
       child: TabBarView(
         children: [
-          MyProducts(),
+          ProductsScreen(),
           MyProductsFashion(),
           MyProductsElectronics(),
           Text("Tab 4 Content"),

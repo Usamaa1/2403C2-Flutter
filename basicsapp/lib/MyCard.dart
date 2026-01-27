@@ -39,8 +39,6 @@
 //   }
 // }
 
-
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -73,7 +71,12 @@ class MyCard extends StatelessWidget {
           Stack(
             alignment: AlignmentDirectional.topEnd,
             children: [
-              Image.memory(base64Decode(imageName)),
+              Image.memory(
+                width: double.infinity,
+                height: 140,
+                base64Decode(imageName),
+                fit: BoxFit.cover,
+              ),
               Padding(
                 padding: const EdgeInsets.all(4),
                 child: CircleAvatar(
@@ -91,7 +94,7 @@ class MyCard extends StatelessWidget {
           SizedBox(height: 6),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(productDescription),
+            child: Text(productDescription,maxLines: 1,),
           ),
           // SizedBox(height: 6),
         ],
