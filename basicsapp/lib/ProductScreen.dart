@@ -25,7 +25,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     getCart();
   }
 
-  /// 🔹 GET CART ITEMS
   Future<void> getCart() async {
     final snapshot =
         await addToCartItems.where("userId", isEqualTo: uid).get();
@@ -35,22 +34,29 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
-  /// 🔹 ADD TO CART
-  Future<void> addToCartHandler(String prodId) async {
-    if (cartItems.contains(prodId)) return;
+Future<void> addToCartHandler(String prodId) async {
+  final snapshot = await addToCartItems
+      .where("userId", isEqualTo: uid)
+      .where("prodId", isEqualTo: prodId)
+      .get();
 
-    await addToCartItems.add({"userId": uid, "prodId": prodId});
-    await getCart();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Product added to your Cart"),
-        backgroundColor: Colors.blueAccent,
-      ),
-    );
+  if (snapshot.docs.isEmpty) {
+    // first time add
+    await addToCartItems.add({
+      "userId": uid,
+      "prodId": prodId,
+      "quantity": 1,
+    });
+  } else {
+    // already exists → increase quantity
+    await snapshot.docs.first.reference.update({
+      "quantity": FieldValue.increment(1),
+    });
   }
 
-  /// 🔹 DELETE FROM CART
+  await getCart();
+}
+
   Future<void> deleteFromCartHandler(String prodId) async {
     final snapshot = await addToCartItems
         .where("userId", isEqualTo: uid)
