@@ -25,7 +25,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     getCart();
   }
 
-  /// 🔹 GET CART ITEMS
+
   Future<void> getCart() async {
     final snapshot =
         await addToCartItems.where("userId", isEqualTo: uid).get();
@@ -35,7 +35,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
-  /// 🔹 ADD TO CART
+
   Future<void> addToCartHandler(String prodId) async {
     if (cartItems.contains(prodId)) return;
 
@@ -50,7 +50,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  /// 🔹 DELETE FROM CART
+
   Future<void> deleteFromCartHandler(String prodId) async {
     final snapshot = await addToCartItems
         .where("userId", isEqualTo: uid)
