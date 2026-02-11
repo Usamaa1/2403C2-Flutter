@@ -1,5 +1,6 @@
 import 'package:basicsapp/MyCarousel.dart';
 import 'package:basicsapp/MyCart.dart';
+import 'package:basicsapp/MyOrdersScreen.dart';
 import 'package:basicsapp/MyProductsElectronics.dart';
 import 'package:basicsapp/MyProductsFashion.dart';
 import 'package:basicsapp/MyTabbar.dart';
@@ -32,10 +33,17 @@ class Home extends StatelessWidget {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
+   
         appBar: AppBar(
           leading: CircleAvatar(child: FaIcon(FontAwesomeIcons.user)),
           title: Text("Home Screen"),
           actions: [
+            IconButton(onPressed:  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => MyOrdersScreen()),
+                    );
+                  }, icon: Icon(Icons.shopping_bag_outlined)),
             Stack(
               children: [
                 IconButton(

@@ -13,8 +13,8 @@ class MyProductsFashion extends StatefulWidget {
 class _MyProductsFashionState extends State<MyProductsFashion> {
   final uid = FirebaseAuth.instance.currentUser!.uid;
 
-  final CollectionReference addToCartItems =
-      FirebaseFirestore.instance.collection("addToCart");
+  final CollectionReference addToCartItems = FirebaseFirestore.instance
+      .collection("addToCart");
 
   final Stream<QuerySnapshot> products = FirebaseFirestore.instance
       .collection("Products")
@@ -29,14 +29,11 @@ class _MyProductsFashionState extends State<MyProductsFashion> {
     getCart();
   }
 
-
   Future<void> getCart() async {
-    final snapshot =
-        await addToCartItems.where("userId", isEqualTo: uid).get();
+    final snapshot = await addToCartItems.where("userId", isEqualTo: uid).get();
 
     setState(() {
-      cartItems =
-          snapshot.docs.map((e) => e["prodId"] as String).toList();
+      cartItems = snapshot.docs.map((e) => e["prodId"] as String).toList();
     });
   }
 
@@ -44,10 +41,7 @@ class _MyProductsFashionState extends State<MyProductsFashion> {
   Future<void> addToCartHandler(String prodId) async {
     if (cartItems.contains(prodId)) return;
 
-    await addToCartItems.add({
-      "userId": uid,
-      "prodId": prodId,
-    });
+    await addToCartItems.add({"userId": uid, "prodId": prodId});
 
     await getCart();
 
@@ -58,7 +52,6 @@ class _MyProductsFashionState extends State<MyProductsFashion> {
       ),
     );
   }
-
 
   Future<void> deleteFromCartHandler(String prodId) async {
     final snapshot = await addToCartItems
@@ -108,10 +101,8 @@ class _MyProductsFashionState extends State<MyProductsFashion> {
 
             return MyCard(
               imageName: prodData[index]['prodImage'],
-              productName:
-                  prodData[index]['prodName'].toString().trim(),
-              productDescription:
-                  prodData[index]['prodDescription'],
+              productName: prodData[index]['prodName'].toString().trim(),
+              productDescription: prodData[index]['prodDescription'],
               productPrice: prodData[index]['prodPrice'],
               cartIcon: Icon(
                 inCart ? Icons.remove : Icons.shopping_bag,

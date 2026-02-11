@@ -11,8 +11,9 @@ class ProductsScreen extends StatefulWidget {
 }
 
 class _ProductsScreenState extends State<ProductsScreen> {
-  final Stream<QuerySnapshot> prods =
-      FirebaseFirestore.instance.collection("Products").snapshots();
+  final Stream<QuerySnapshot> prods = FirebaseFirestore.instance
+      .collection("Products")
+      .snapshots();
   final addToCartItems = FirebaseFirestore.instance.collection("addToCart");
 
   final uid = FirebaseAuth.instance.currentUser!.uid;
@@ -25,31 +26,36 @@ class _ProductsScreenState extends State<ProductsScreen> {
     getCart();
   }
 
-
   Future<void> getCart() async {
-    final snapshot =
-        await addToCartItems.where("userId", isEqualTo: uid).get();
+    final snapshot = await addToCartItems.where("userId", isEqualTo: uid).get();
 
     setState(() {
       cartItems = snapshot.docs.map((e) => e["prodId"] as String).toList();
     });
   }
 
-
   Future<void> addToCartHandler(String prodId) async {
-    if (cartItems.contains(prodId)) return;
+    final snapshot = await addToCartItems
+        .where("userId", isEqualTo: uid)
+        .where("prodId", isEqualTo: prodId)
+        .get();
 
-    await addToCartItems.add({"userId": uid, "prodId": prodId});
+    if (snapshot.docs.isEmpty) {
+      // first time add
+      await addToCartItems.add({
+        "userId": uid,
+        "prodId": prodId,
+        "quantity": 1,
+      });
+    } else {
+      // already exists → increase quantity
+      await snapshot.docs.first.reference.update({
+        "quantity": FieldValue.increment(1),
+      });
+    }
+
     await getCart();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Product added to your Cart"),
-        backgroundColor: Colors.blueAccent,
-      ),
-    );
   }
-
 
   Future<void> deleteFromCartHandler(String prodId) async {
     final snapshot = await addToCartItems

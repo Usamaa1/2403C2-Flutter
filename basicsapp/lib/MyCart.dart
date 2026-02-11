@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:basicsapp/CheckoutScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -78,21 +79,45 @@ class MyCart extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔢 TOTAL
                   Container(
                     padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
                       children: [
-                        const Text(
-                          "Total",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Total",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              "USD \$${total.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          "USD \$${total.toStringAsFixed(2)}",
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+
+                        const SizedBox(height: 10),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CheckoutScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text("Checkout"),
+                          ),
                         ),
                       ],
                     ),
@@ -108,12 +133,12 @@ class MyCart extends StatelessWidget {
 
   /// 🔄 Load products from Products collection
   Future<List<Map<String, dynamic>>> _loadCartProducts(
-      List<QueryDocumentSnapshot> cartDocs) async {
+    List<QueryDocumentSnapshot> cartDocs,
+  ) async {
     List<Map<String, dynamic>> items = [];
 
     for (var cart in cartDocs) {
-      final prod =
-          await productsRef.doc(cart["prodId"]).get();
+      final prod = await productsRef.doc(cart["prodId"]).get();
 
       if (!prod.exists) continue;
 
