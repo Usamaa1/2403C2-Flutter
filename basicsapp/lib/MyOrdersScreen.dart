@@ -12,6 +12,8 @@ class MyOrdersScreen extends StatelessWidget {
   Future<void> _cancelOrder(BuildContext context, String orderId) async {
     await ordersRef.doc(orderId).update({"status": "cancelled"});
 
+    Navigator.pop(context);
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text("Order cancelled")));
@@ -75,9 +77,36 @@ class MyOrdersScreen extends StatelessWidget {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.redAccent,
-                              foregroundColor: Colors.white
+                              foregroundColor: Colors.white,
                             ),
-                            onPressed: () => _cancelOrder(context, order.id),
+                            onPressed: () => {
+                 
+                              showDialog(
+                                context: context,
+                                builder: (_) {
+                                  return AlertDialog(
+                                    title: Text("Cancel Order"),
+                                    content: Text(
+                                      "Are you sure you want to cancel this order?",
+                                    ),
+                                    // actionsAlignment: MainAxisAlignment.center,
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text("No"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => _cancelOrder(
+                                          context,
+                                          order.id,
+                                        ),
+                                        child: const Text("Yes"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            },
                             child: const Text("Cancel Order"),
                           ),
                         ),

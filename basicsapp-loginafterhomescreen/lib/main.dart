@@ -1,5 +1,4 @@
 import 'package:basicsapp/Home.dart';
-import 'package:basicsapp/Login.dart';
 import 'package:basicsapp/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
