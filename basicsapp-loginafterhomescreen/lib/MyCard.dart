@@ -73,7 +73,7 @@ class MyCard extends StatelessWidget {
             children: [
               Image.memory(
                 width: double.infinity,
-                height: 140,
+                height: 100,
                 base64Decode(imageName),
                 fit: BoxFit.cover,
               ),

@@ -118,13 +118,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
               }
 
               final prodData = snapshot.data!.docs;
+              var screenWidth = MediaQuery.of(context).size.width;
 
               return GridView.builder(
                 padding: const EdgeInsets.all(8),
                 itemCount: prodData.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.85,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: screenWidth <= 900 ? 2 : 4,
+                  // childAspectRatio: 0.85,
+                  mainAxisExtent: 220,
                 ),
                 itemBuilder: (context, index) {
                   final prodId = prodData[index].id;
