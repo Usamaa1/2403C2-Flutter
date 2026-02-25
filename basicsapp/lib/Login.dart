@@ -1,3 +1,6 @@
+import 'package:basicsapp/AdminDashboardScreen.dart';
+import 'package:basicsapp/AdminOrderScreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:basicsapp/Home.dart';
@@ -20,15 +23,32 @@ class Login extends StatelessWidget {
               password: password.text,
             );
 
-        if (credential.user!.emailVerified) {
+        if (!credential.user!.emailVerified) return;
+
+        final uid = credential.user!.uid;
+
+        final userDoc = await FirebaseFirestore.instance
+            .collection("users")
+            .doc(uid)
+            .get();
+
+        if (!userDoc.exists) return;
+
+        final role = userDoc.data()?["role"] ?? "user";
+
+        if (role == "admin") {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Home()),
+            MaterialPageRoute(builder: (_) => AdminDashboardScreen()),
           );
         } else {
-          print("Email is not verified");
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => Home()),
+          );
         }
       } on FirebaseAuthException catch (e) {
+        print(e);
         if (e.code == 'user-not-found') {
           print('No user found for that email.');
         } else if (e.code == 'wrong-password') {

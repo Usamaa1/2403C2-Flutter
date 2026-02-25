@@ -1,3 +1,4 @@
+import 'package:basicsapp/OrderDetailsScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -46,71 +47,82 @@ class MyOrdersScreen extends StatelessWidget {
                   ? timestamp.toDate().toString().substring(0, 16)
                   : "";
 
-              return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Order #${order.id.substring(0, 6)}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-
-                      const SizedBox(height: 6),
-
-                      Text("Total: USD \$${order["total"]}"),
-                      Text("Status: ${order["status"]}"),
-                      Text(date),
-
-                      const SizedBox(height: 10),
-
-                      /// Cancel Button
-                      if (order["status"] == "pending" ||
-                          order["status"] == "confirmed")
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              foregroundColor: Colors.white,
-                            ),
-                            onPressed: () => {
-                 
-                              showDialog(
-                                context: context,
-                                builder: (_) {
-                                  return AlertDialog(
-                                    title: Text("Cancel Order"),
-                                    content: Text(
-                                      "Are you sure you want to cancel this order?",
-                                    ),
-                                    // actionsAlignment: MainAxisAlignment.center,
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text("No"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => _cancelOrder(
-                                          context,
-                                          order.id,
-                                        ),
-                                        child: const Text("Yes"),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            },
-                            child: const Text("Cancel Order"),
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => OrderDetailsScreen(orderId: order.id),
+                    ),
+                  );
+                },
+                child: Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Order #${order.id.substring(0, 6)}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
-                    ],
+
+                        const SizedBox(height: 6),
+
+                        Text("Total: USD \$${order["total"]}"),
+                        Text("Status: ${order["status"]}"),
+                        Text(date),
+
+                        const SizedBox(height: 10),
+
+                        /// Cancel Button
+                        if (order["status"] == "pending" ||
+                            order["status"] == "confirmed")
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.redAccent,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: () => {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) {
+                                    return AlertDialog(
+                                      title: Text("Cancel Order"),
+                                      content: Text(
+                                        "Are you sure you want to cancel this order?",
+                                      ),
+                                      // actionsAlignment: MainAxisAlignment.center,
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text("No"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              _cancelOrder(context, order.id),
+                                          child: const Text("Yes"),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              },
+                              child: const Text("Cancel Order"),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               );
