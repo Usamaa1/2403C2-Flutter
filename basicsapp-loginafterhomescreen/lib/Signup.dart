@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:basicsapp/Home.dart';
@@ -22,6 +23,15 @@ class Signup extends StatelessWidget {
 
         await credential.user!.sendEmailVerification();
 
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(credential.user!.uid)
+            .set({
+              "email": email.text,
+              "role": "user", // default role
+              "createdAt": FieldValue.serverTimestamp(),
+            });
+
         print(credential);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -35,8 +45,6 @@ class Signup extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (context) => Login()),
         );
-
-        
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           ScaffoldMessenger.of(context).showSnackBar(

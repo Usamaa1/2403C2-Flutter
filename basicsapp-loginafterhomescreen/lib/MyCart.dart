@@ -14,6 +14,8 @@ class MyCart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
+   
     if (user == null) {
       // go to login
       Future.microtask(() {

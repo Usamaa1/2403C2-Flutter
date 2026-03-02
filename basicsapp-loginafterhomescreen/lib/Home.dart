@@ -1,3 +1,4 @@
+import 'package:basicsapp/Login.dart';
 import 'package:basicsapp/MyCarousel.dart';
 import 'package:basicsapp/MyCart.dart';
 import 'package:basicsapp/MyOrdersScreen.dart';
@@ -7,6 +8,7 @@ import 'package:basicsapp/MyTabbar.dart';
 import 'package:basicsapp/ProductScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -105,6 +107,48 @@ class Home extends StatelessWidget {
                 ),
               ],
             ),
+          FirebaseAuth.instance.currentUser != null ? IconButton(
+              onPressed: () {
+                print("Signout");
+
+                showCupertinoDialog(
+                  context: context,
+                  builder: (context) {
+                    return CupertinoAlertDialog(
+                      title: Text("Logout"),
+                      content: Text("Do you want to logout?"),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: Text("No"),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        CupertinoDialogAction(
+                          child: Text("Yes"),
+                          onPressed: () => {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(builder: (context) => Home()),
+                              (route) => false,
+                            ),
+                            FirebaseAuth.instance.signOut(),
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: Icon(Icons.logout),
+            ):
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => Login()),
+                );
+              },
+              icon: Icon(Icons.login),
+            )
           ],
         ),
         body: NestedScrollView(
