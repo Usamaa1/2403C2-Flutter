@@ -52,6 +52,7 @@ class MyCard extends StatelessWidget {
     required this.productPrice,
     this.onPressed,
     required this.cartIcon,
+    this.productRating = 0.0,
   });
 
   final String imageName;
@@ -59,6 +60,7 @@ class MyCard extends StatelessWidget {
   final String productDescription;
   final String productPrice;
   final Icon cartIcon;
+  final double productRating;
   final void Function()? onPressed;
 
   @override
@@ -90,6 +92,14 @@ class MyCard extends StatelessWidget {
           SizedBox(height: 6),
           Text(productName, style: TextStyle(fontSize: 18)),
           SizedBox(height: 6),
+          // --- ADD RATING ROW HERE ---
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.star, color: Colors.amber, size: 16),
+              Text(" ${productRating.toStringAsFixed(1)}", style: const TextStyle(fontSize: 13)),
+            ],
+          ),
           Text(productPrice),
           SizedBox(height: 6),
           Padding(

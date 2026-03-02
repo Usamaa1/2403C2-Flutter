@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 class AdminOrderScreen extends StatelessWidget {
   final ordersRef = FirebaseFirestore.instance.collection("orders");
 
+   AdminOrderScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +21,7 @@ class AdminOrderScreen extends StatelessWidget {
             itemCount: orders.length,
             itemBuilder: (context, index) {
               final order = orders[index];
-              final data = order.data() as Map<String, dynamic>;
+              final data = order.data();
 
               return Card(
                 child: ListTile(

@@ -26,6 +26,24 @@ class _ProductsScreenState extends State<ProductsScreen> {
     getCart();
   }
 
+  Future<double> getAverageRating(String productId) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection("reviews")
+        .where("productId", isEqualTo: productId)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      return 0.0; // No reviews yet
+    }
+
+    double totalRating = 0;
+    for (var doc in snapshot.docs) {
+      totalRating += (doc.data()["rating"] ?? 0).toDouble();
+    }
+
+    return totalRating / snapshot.docs.length;
+  }
+
   Future<void> getCart() async {
     final snapshot = await addToCartItems.where("userId", isEqualTo: uid).get();
 
@@ -105,25 +123,50 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 itemBuilder: (context, index) {
                   final prodId = prodData[index].id;
                   final inCart = cartItems.contains(prodId);
-
-                  return MyCard(
-                    imageName: prodData[index]['prodImage'],
-                    productName: prodData[index]['prodName'].toString().trim(),
-                    productDescription: prodData[index]['prodDescription'],
-                    productPrice: prodData[index]['prodPrice'],
-                    cartIcon: Icon(
-                      inCart ? Icons.remove : Icons.shopping_bag,
-                      size: 18,
-                      color: inCart ? Colors.red : Colors.blueAccent,
-                    ),
-                    onPressed: () {
+                  var doc = snapshot.data!.docs[index];
+                  return FutureBuilder<double>(
+                    future: getAverageRating(
+                      doc.id,
+                    ), // Fetch rating for this product ID
+                    builder: (context, ratingSnapshot) {
+                      return MyCard(
+                        imageName: doc["prodImage"],
+                        productName: doc["prodName"].trim(),
+                        productPrice: doc["prodPrice"],
+                        productDescription: doc["prodDescription"] ?? "",
+                        productRating:
+                            ratingSnapshot.data ??
+                            0.0, // Pass the fetched rating
+                        cartIcon: const Icon(Icons.shopping_cart),
+                        onPressed: () {
                       if (inCart) {
                         deleteFromCartHandler(prodId);
                       } else {
                         addToCartHandler(prodId);
                       }
                     },
+                      );
+                    },
                   );
+
+                  // return MyCard(
+                  //   imageName: prodData[index]['prodImage'],
+                  //   productName: prodData[index]['prodName'].toString().trim(),
+                  //   productDescription: prodData[index]['prodDescription'],
+                  //   productPrice: prodData[index]['prodPrice'],
+                  //   cartIcon: Icon(
+                  //     inCart ? Icons.remove : Icons.shopping_bag,
+                  //     size: 18,
+                  //     color: inCart ? Colors.red : Colors.blueAccent,
+                  //   ),
+                  //   onPressed: () {
+                  //     if (inCart) {
+                  //       deleteFromCartHandler(prodId);
+                  //     } else {
+                  //       addToCartHandler(prodId);
+                  //     }
+                  //   },
+                  // );
                 },
               );
             },
